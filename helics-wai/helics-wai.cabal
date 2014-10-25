@@ -26,7 +26,7 @@ library
   build-depends:       base               >=4.6  && <4.8
                      , wai                >=3.0  && <3.1
                      , vault              >=0.3  && <0.4
-                     , helics             >=0.5  && <0.6
+                     , helics             >=0.6  && <0.7
                      , data-default-class >=0.0  && <0.1
                      , bytestring         >=0.10 && <0.11
   ghc-options:         -Wall -O2

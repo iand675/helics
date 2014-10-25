@@ -1,7 +1,7 @@
 module Network.Helics.Wai
-    ( Safe.HelicsMiddlewareConfig(..)
+    ( 
     -- * middleware
-    , helics
+      helics
     , dummyHelics
     -- * getter
     , transactionId
@@ -21,7 +21,7 @@ tidKey = unsafePerformIO V.newKey
 {-# NOINLINE tidKey #-}
 
 -- | helics middleware.
-helics :: Safe.HelicsMiddlewareConfig -> Middleware
+helics :: Middleware
 helics = Safe.helics tidKey
 
 dummyHelics :: Middleware

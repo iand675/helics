@@ -15,6 +15,8 @@ module Network.Helics
     , TransactionId
     , withTransaction
     , addAttribute
+    , setTransactionName
+    , setTransactionCategory
     , setRequestUrl
     , setMaxTraceSegments
     , TransactionError(..)
@@ -78,9 +80,8 @@ recordCpuUsage _ _ = return ()
 recordMemoryUsage :: Double -> IO ()
 recordMemoryUsage _ = return ()
 
-withTransaction :: S.ByteString -- ^ name of transaction
-                -> TransactionType -> (TransactionId -> IO c) -> IO c
-withTransaction _ _ m = do
+withTransaction :: TransactionType -> (TransactionId -> IO c) -> IO c
+withTransaction _ m = do
     ref <- newIORef Nothing
     m (TransactionId 0 ref)
 
@@ -117,3 +118,10 @@ noticeError _ _ = return ()
 
 clearError :: TransactionId -> IO ()
 clearError _ = return ()
+
+setTransactionName :: S.ByteString -> TransactionId -> IO ()
+setTransactionName _ _ = return ()
+
+setTransactionCategory :: S.ByteString -> TransactionId -> IO ()
+setTransactionCategory _ _ = return ()
+

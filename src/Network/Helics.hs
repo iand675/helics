@@ -16,6 +16,8 @@ module Network.Helics
     , TransactionId
     , withTransaction
     , addAttribute
+    , setTransactionName
+    , setTransactionCategory
     , setRequestUrl
     , setMaxTraceSegments
     , TransactionError(..)
@@ -126,25 +128,19 @@ recordMemoryUsage :: Double -> IO ()
 recordMemoryUsage mb = 
    newrelic_record_memory_usage (realToFrac mb) >>= guardNr
 
-withTransaction :: S.ByteString -- ^ name of transaction
-                -> TransactionType -> (TransactionId -> IO c) -> IO c
-withTransaction name typ act = bracket bra ket
+withTransaction :: TransactionType -> (TransactionId -> IO c) -> IO c
+withTransaction typ act = bracket bra ket
     (\tid -> act tid `catch` (\e -> exceptionHandler tid e >> throwIO e))
   where
     bra = do
         tid <- newrelic_transaction_begin
-        guardNr =<< S.useAsCString name (newrelic_transaction_set_name tid)
         err <- newIORef Nothing
         return $ TransactionId tid err
     ket DummyTransactionId = return ()
     ket (TransactionId tid er) = do
         case typ of
-            Default -> return ()
-            Web cat ->
-                guardNr =<< S.useAsCString cat (newrelic_transaction_set_category tid)
-            Other cat -> do
-                guardNr =<< newrelic_transaction_set_type_other tid
-                guardNr =<< S.useAsCString cat (newrelic_transaction_set_category tid)
+            Other -> guardNr =<< newrelic_transaction_set_type_other tid
+            _ -> return ()
         err <- readIORef er
         case err of
             Nothing -> return ()
@@ -248,3 +244,10 @@ noticeError = setError . Just
 
 clearError :: TransactionId -> IO ()
 clearError = setError Nothing
+
+setTransactionCategory :: S.ByteString -> TransactionId -> IO ()
+setTransactionCategory cat (TransactionId tid _) = guardNr =<< S.useAsCString cat (newrelic_transaction_set_category tid)
+
+setTransactionName :: S.ByteString -> TransactionId -> IO ()
+setTransactionName name (TransactionId tid _) = guardNr =<< S.useAsCString name (newrelic_transaction_set_name tid)
+

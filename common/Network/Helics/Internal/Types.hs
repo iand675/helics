@@ -59,8 +59,8 @@ instance Default HelicsConfig where
 
 data TransactionType
     = Default
-    | Web   S.ByteString
-    | Other S.ByteString
+    | Web
+    | Other
 
 instance Default TransactionType where
     def = Default

@@ -1,7 +1,7 @@
 module Network.Helics.Wai.Safe
-    ( HelicsMiddlewareConfig(..)
+    ( 
     -- * middleware
-    , helics
+      helics
     , dummyHelics
     -- * getter
     , transactionId
@@ -14,22 +14,11 @@ import Network.Wai
 import Network.Helics
 import Network.Helics.Internal.Types (TransactionId(..))
 
-import Data.IORef
-import Data.Default.Class
 import Data.Vault.Lazy as V
-import qualified Data.ByteString as S
-
-newtype HelicsMiddlewareConfig = HelicsMiddlewareConfig
-    { transactionName :: Request -> S.ByteString
-    }
-
-instance Default HelicsMiddlewareConfig where
-    def = HelicsMiddlewareConfig rawPathInfo
 
 -- | helics middleware.
-helics :: Key TransactionId -> HelicsMiddlewareConfig -> Middleware
-helics key conf app req send =
-    withTransaction (transactionName conf req) def $ \tid -> do
+helics :: Key TransactionId -> Middleware
+helics key app req send = withTransaction def $ \tid -> do
    setRequestUrl (rawPathInfo req) tid
    app req { vault = insert key tid (vault req) } send
 
